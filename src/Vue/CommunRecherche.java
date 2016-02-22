@@ -13,13 +13,13 @@ import javax.swing.JTable;
 import javax.swing.JTextField;
 
 import AjusteurColonnes.AdjusterHandler;
+import Controleur.EffacerRecherche;
 import Controleur.Sauvegarder;
 import interfaces.Searchable;
 
 @SuppressWarnings("serial")
 public class CommunRecherche extends JPanel{
 	
-	private Tableau resultats; 
 	private JTable tableau; 
 	private JScrollPane scroll;
 	private AdjusterHandler taille_tableau;
@@ -73,8 +73,11 @@ public class CommunRecherche extends JPanel{
 		conteneur_bouton.add(rechercher);
 		conteneur_bouton.add(actualiser);
 		
-		conteneur_barre.setLayout(new FlowLayout());
+		conteneur_barre.setLayout(new BoxLayout(conteneur_barre, BoxLayout.LINE_AXIS));
 		conteneur_barre.add(zone_recherche);
+		
+		zone_recherche.addMouseListener(new EffacerRecherche(zone_recherche));;
+		
 	}
 
 
