@@ -178,5 +178,9 @@ public class TableModel extends AbstractTableModel{
 			fireTableDataChanged();
 		}
 	}
+	
+	public ArrayList<String> getData() {
+		return data.get(0);
+	}
 
 }
