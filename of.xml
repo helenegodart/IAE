@@ -1,0 +1,9 @@
+<!--Exemple-->
+<tables>
+    <table nom="ITMMASTER" all="yes">
+        <colonne nom="TSICOD_0"/>
+        <colonne nom="TSICOD_1"/>
+        
+        <condition>ITMFACILIT.ITMREF_0=ITMMASTER.ITMREF_0</condition>
+    </table>
+</tables>

@@ -22,9 +22,6 @@ public class BarreOngletsPerso extends BasicTabbedPaneUI{
 
 	
 	
-	
-	
-	
 	/**
 	 * La méthode paintTabBackground permet de changer la couleur de
 	 * fond de la barre qui contient les onglets.
