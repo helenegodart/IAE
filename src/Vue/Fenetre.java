@@ -10,6 +10,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 
+import Controleur.Sauvegarder;
 import model.Connecteur;
 
 @SuppressWarnings("serial")
@@ -29,6 +30,7 @@ public class Fenetre extends JFrame {
 	private Connecteur connecteur;
 
 	public Fenetre(Connecteur connecteur){
+		System.out.println("new fenetre");
 		this.connecteur = connecteur;
 		titre = "IAE";
 		
@@ -64,6 +66,17 @@ public class Fenetre extends JFrame {
 		pack();
 		setVisible(true);
 
+	}
+	
+	public void setConnecteur(Connecteur connecteur) {
+		this.connecteur = connecteur;
+		onglets.setArticle(connecteur.getArticle());
+		onglets.setOF(connecteur.getOf());
+		this.revalidate();
+	}
+	
+	public ListeOnglets getOnglets() {
+		return onglets;
 	}
 
 }

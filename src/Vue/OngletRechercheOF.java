@@ -1,6 +1,7 @@
 package Vue;
 
 import java.awt.BorderLayout;
+import java.util.ArrayList;
 
 import javax.swing.JPanel;
 
@@ -10,13 +11,25 @@ import model.OrdreFabrication;
 @SuppressWarnings("serial")
 public class OngletRechercheOF extends JPanel {
 
+	private OrdreFabrication of; 
+	private CommunRecherche communRecherche;
+
 	public OngletRechercheOF(OrdreFabrication of) {
-
-		setLayout(new BorderLayout());
-		CommunRecherche commun_recherche = new CommunRecherche(of);
-		add(commun_recherche, BorderLayout.CENTER);
-		commun_recherche.creeRecherche(new RechercherOF());
-
+		this.of = of;
+		communRecherche = new CommunRecherche(of);
+		this.setLayout(new BorderLayout());
+		this.add(communRecherche, BorderLayout.CENTER);
+		communRecherche.creeRecherche(new RechercherOF());
+	}
+	
+	public void setOF(OrdreFabrication of) {
+		this.of = of;
+		communRecherche.setSearchable(of);
+		this.revalidate();
+	}
+	
+	public CommunRecherche getCommunRecherche() {
+		return communRecherche;
 	}
 
 }
