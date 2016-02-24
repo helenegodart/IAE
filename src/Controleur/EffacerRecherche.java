@@ -44,6 +44,7 @@ public class EffacerRecherche implements MouseListener{
 
 		if(recherche.getText().equals("Rechercher un élément")){
 			recherche.setText("");
+			recherche.setEnabled(true);
 		} else {
 		}
 

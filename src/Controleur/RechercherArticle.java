@@ -48,4 +48,7 @@ public class RechercherArticle implements ActionListener{
 
 	}
 
+	public void setArticle(Article article) {
+		this.article = article;
+	}
 }

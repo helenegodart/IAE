@@ -7,6 +7,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import javax.swing.JOptionPane;
+
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
@@ -87,6 +89,8 @@ public class Mapping {
 		   catch (java.io.IOException e){
 			   e.printStackTrace();
 		   }
+		
+		JOptionPane.showMessageDialog(null, "Le fichier \"sortie.xml\" a été généré correctement", "Mapping terminé !", JOptionPane.INFORMATION_MESSAGE, null);
 		return true;
 	}
 }

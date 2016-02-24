@@ -13,6 +13,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 
 import AjusteurColonnes.AdjusterHandler;
@@ -42,48 +43,58 @@ public class CommunRecherche extends JPanel implements Observer{
 		
 		//Initialisation
 		this.searchable = searchable;
-		resultats = searchable.getModel();
-		tableau = new JTable(resultats);
-		scroll = new JScrollPane(tableau, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-		conteneur_recherche = new JPanel();
-		rechercher = new JButton("Rechercher");
-		actualiser = new JButton("Actualiser");
-		envoi = new JButton("Sauvegarder dans un fichier");
-		zone_recherche = new JTextField("Rechercher un élément");
-		conteneur_bouton = new JPanel();
-		conteneur_barre = new JPanel();
-		
-		((Observable) searchable).addObserver(this);
-		
-		//Paramètres du tableau
-		
-		
-		//Taille des éléments
-		zone_recherche.setPreferredSize(new Dimension(150, 30));
-		conteneur_recherche.setPreferredSize(new Dimension(100, 50));
+		init();
+	}
 	
-		// BorderLayout
-		setLayout(new BorderLayout());
-		add(conteneur_recherche, BorderLayout.NORTH);
-		add(scroll, BorderLayout.CENTER);
-		add(envoi,  BorderLayout.SOUTH);
-		
-		envoi.addActionListener(new Sauvegarder(searchable));
+	private void init() {
+		//TODO changement
+				if (searchable != null) {
+					resultats = searchable.getModel();
+				}
+				else {
+					resultats = new DefaultTableModel();
+				}
+				tableau = new JTable(resultats);
+				scroll = new JScrollPane(tableau, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+				conteneur_recherche = new JPanel();
+				rechercher = new JButton("Rechercher");
+				actualiser = new JButton("Actualiser");
+				envoi = new JButton("Sauvegarder dans un fichier");
+				zone_recherche = new JTextField("Rechercher un élément");
+				conteneur_bouton = new JPanel();
+				conteneur_barre = new JPanel();
+				
+				if (searchable != null) ((Observable) searchable).addObserver(this);
+				
+				//Paramètres du tableau
+				
+				
+				//Taille des éléments
+				zone_recherche.setPreferredSize(new Dimension(150, 30));
+				conteneur_recherche.setPreferredSize(new Dimension(100, 50));
+			
+				// BorderLayout
+				setLayout(new BorderLayout());
+				add(conteneur_recherche, BorderLayout.NORTH);
+				add(scroll, BorderLayout.CENTER);
+				add(envoi,  BorderLayout.SOUTH);
+				
+				envoi.addActionListener(new Sauvegarder(searchable));
 
-		// BoxLayout inclus dans le BorderLayout
-		conteneur_recherche.setLayout(new BoxLayout(conteneur_recherche, BoxLayout.LINE_AXIS));
-		conteneur_recherche.add(conteneur_barre);
-		conteneur_recherche.add(conteneur_bouton);
-		
-		conteneur_bouton.setLayout(new BoxLayout(conteneur_bouton, BoxLayout.LINE_AXIS));
-		conteneur_bouton.add(rechercher);
-		conteneur_bouton.add(actualiser);
-		
-		conteneur_barre.setLayout(new BoxLayout(conteneur_barre, BoxLayout.LINE_AXIS));
-		conteneur_barre.add(zone_recherche);
-		
-		zone_recherche.addMouseListener(new EffacerRecherche(zone_recherche));;
-		
+				// BoxLayout inclus dans le BorderLayout
+				conteneur_recherche.setLayout(new BoxLayout(conteneur_recherche, BoxLayout.LINE_AXIS));
+				conteneur_recherche.add(conteneur_barre);
+				conteneur_recherche.add(conteneur_bouton);
+				
+				conteneur_bouton.setLayout(new BoxLayout(conteneur_bouton, BoxLayout.LINE_AXIS));
+				conteneur_bouton.add(rechercher);
+				conteneur_bouton.add(actualiser);
+				
+				conteneur_barre.setLayout(new BoxLayout(conteneur_barre, BoxLayout.LINE_AXIS));
+				conteneur_barre.add(zone_recherche);
+				
+				zone_recherche.addMouseListener(new EffacerRecherche(zone_recherche));
+				if (searchable == null) zone_recherche.setEnabled(false);
 	}
 
 
@@ -96,6 +107,12 @@ public class CommunRecherche extends JPanel implements Observer{
 		taille_tableau.run();
 		tableau.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 		tableau.getTableHeader().setReorderingAllowed(false);
+	}
+	
+	public void setSearchable(Searchable searchable) {
+		this.searchable = searchable;
+		init();
+		this.revalidate();
 	}
 	
 	@Override
