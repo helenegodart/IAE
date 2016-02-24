@@ -33,7 +33,6 @@ public class Connecteur implements Runnable{
 		Fenetre fen = new Fenetre(connecteur);
 		try {
 			t.join();
-			System.out.println(connecteur.getArticle().toString());
 			fen.setConnecteur(connecteur);
 			fen.revalidate();
 			fen.getOnglets().getOngletArticle().getCommunRecherche().getZone_recherche().setEnabled(true);

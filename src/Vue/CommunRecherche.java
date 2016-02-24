@@ -121,7 +121,6 @@ public class CommunRecherche extends JPanel implements Observer{
 		paramsTableau();
 		this.scroll.setViewportView(tableau);
 		this.revalidate();
-		System.out.println("update, data rows : "+searchable.getModel().getValueAt(0, 0));
 	}
 	
 	public JTextField getZone_recherche() {
