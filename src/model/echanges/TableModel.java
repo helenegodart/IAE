@@ -91,6 +91,7 @@ public class TableModel extends AbstractTableModel{
 		Statement stmt = con.createStatement();
 		String nomTable = null;
 		Element condition=null;
+		int cumulCol = 0;
 		//Pour chaque table
 		for (Element table : tables) {
 			nomTable = databaseName+"."+table.getAttributeValue("nom");
@@ -139,22 +140,25 @@ public class TableModel extends AbstractTableModel{
 			
 			//On récupère les résultats, qu'on ajoute dans les colonnes
 			int nbColonnes = res.getMetaData().getColumnCount();
-			//Ajout des noms de colonnes
-			for (int i = 1; i <= nbColonnes; i++) {
-				colonneNames.put(colonneNames.size(), nomTable+"."+res.getMetaData().getColumnLabel(i));
-				colonneNamesIndex.put(res.getMetaData().getColumnLabel(i), colonneNamesIndex.size());
-			}
+			
+//			//Ajout des noms de colonnes
+//			for (int i = 1; i <= nbColonnes; i++) {
+//				colonneNames.put(colonneNames.size(), nomTable+"."+res.getMetaData().getColumnLabel(i));
+//				colonneNamesIndex.put(res.getMetaData().getColumnLabel(i), colonneNamesIndex.size());
+//			}
 			//Ajout des données
 			int nbLignes = 0;
 			while (res.next()) {
 				nbLignes++;
 				ArrayList<String> ligne = new ArrayList<String>();
 				//Initialisation
-				for (int i = 0; i < colonneNames.size(); i++) {
+				for (int i = 0; i < cumulCol+nbColonnes; i++) {
 					ligne.add("");
 				}
 				for (int i = 1; i <= nbColonnes; i++) {
-					ligne.set(colonneNamesIndex.get(res.getMetaData().getColumnName(i)),res.getObject(i).toString());
+					ligne.set(cumulCol+i-1,res.getObject(i).toString());
+					colonneNames.put(cumulCol+i-1, nomTable+"."+res.getMetaData().getColumnLabel(i));
+					colonneNamesIndex.put(res.getMetaData().getColumnLabel(i), cumulCol+i-1);
 				} 
 				data.add(ligne);
 			}
@@ -167,6 +171,7 @@ public class TableModel extends AbstractTableModel{
 			}
 			res.close();
 			sql = "SELECT ";
+			cumulCol += nbColonnes;
 		}//Fin du for sur les tables
 		//Traitement de data pour merger les résultats dans une seule ligne
 		ArrayList<String> r = new ArrayList<String>();
