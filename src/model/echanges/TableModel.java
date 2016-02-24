@@ -276,4 +276,8 @@ public class TableModel extends AbstractTableModel{
 		return data.get(0);
 	}
 
+	public HashMap<String, Integer> getColonneNamesIndex() {
+		return colonneNamesIndex;
+	}
+
 }

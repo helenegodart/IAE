@@ -11,25 +11,21 @@ import org.jdom2.Element;
 import org.jdom2.JDOMException;
 import org.jdom2.input.SAXBuilder;
 
+import interfaces.Searchable;
+
 public class Mapping {
 
-	private Article article;
-	private OrdreFabrication of;
 	private Document map, sortie;
 	private ArrayList<Element> tables;
 	private ArrayList<String> tableNames, data;
-	private HashMap<Integer, String> colonneNames;
-	private String articleName;
+	private HashMap<String, Integer> colonneNames;
 	
-	public Mapping(Article article, OrdreFabrication of, String articleName) throws JDOMException, IOException {
-		this.article = article;
-		this.of = of;
-		this.articleName = articleName;
+	public Mapping(Searchable searchable) {
 		sortie = new Document(new Element("flexnet"));
 		tables = new ArrayList<Element>();
 		tableNames = new ArrayList<String>();
-		colonneNames = article.getModel().getColonneNames();
-		data = article.getModel().getData();
+		colonneNames = searchable.getModel().getColonneNamesIndex();
+		data = searchable.getModel().getData();
 	}
 	
 	public boolean map() throws JDOMException, IOException {
@@ -49,7 +45,7 @@ public class Mapping {
 					if (e.getAttributeValue("nom").equals(flexTable)) {
 						Element el = new Element("colonne");
 						el.setAttribute("nom", flexCol);
-						el.setText(get(flexCol));
+						el.setText(data.get(colonneNames.get(flexCol)));
 						e.addContent(el);
 					}
 				}
@@ -60,20 +56,12 @@ public class Mapping {
 				e.setAttribute("nom", flexTable);
 				Element el = new Element("colonne");
 				el.setAttribute("nom", flexCol);
-				el.setText(get(flexCol));
+				el.setText(data.get(colonneNames.get(flexCol)));
 				e.addContent(el);
 				tableNames.add(flexTable);
 				tables.add(e);
 			}
 		}
 		return true;
-	}
-	
-	private String get(String index) {
-		for (Integer integer : colonneNames.keySet()) {
-			if (colonneNames.get(integer).equals(index))
-				return data.get(integer);
-		}
-		return null;
 	}
 }

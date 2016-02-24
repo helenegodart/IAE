@@ -52,7 +52,8 @@ public class Fenetre extends JFrame {
 		// Sous-menu
 		fichiers.add(sauvegarde);
 
-		fichiers.addActionListener(new Sauvegarder());
+		//TODO checker
+		//fichiers.addActionListener(new Sauvegarder());
 
 		// Ajout de la barre de menu
 		setJMenuBar(barre_menu);

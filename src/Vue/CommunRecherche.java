@@ -56,10 +56,7 @@ public class CommunRecherche extends JPanel implements Observer{
 		((Observable) searchable).addObserver(this);
 		
 		//Paramètres du tableau
-		taille_tableau = new AdjusterHandler(tableau);
-		taille_tableau.run();
-		tableau.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-		tableau.getTableHeader().setReorderingAllowed(false);
+		
 		
 		//Taille des éléments
 		zone_recherche.setPreferredSize(new Dimension(150, 30));
@@ -71,7 +68,7 @@ public class CommunRecherche extends JPanel implements Observer{
 		add(scroll, BorderLayout.CENTER);
 		add(envoi,  BorderLayout.SOUTH);
 		
-		envoi.addActionListener(new Sauvegarder());
+		envoi.addActionListener(new Sauvegarder(searchable));
 
 		// BoxLayout inclus dans le BorderLayout
 		conteneur_recherche.setLayout(new BoxLayout(conteneur_recherche, BoxLayout.LINE_AXIS));
@@ -91,14 +88,20 @@ public class CommunRecherche extends JPanel implements Observer{
 
 
 	public void creeRecherche(ActionListener action_listener) {
-		
 		rechercher.addActionListener(action_listener);		
-		
+	}
+	
+	private void paramsTableau(){
+		taille_tableau = new AdjusterHandler(tableau);
+		taille_tableau.run();
+		tableau.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+		tableau.getTableHeader().setReorderingAllowed(false);
 	}
 	
 	@Override
 	public void update(Observable arg0, Object arg1) {
 		tableau = new JTable(resultats);
+		paramsTableau();
 		this.scroll.setViewportView(tableau);
 		this.revalidate();
 		System.out.println("update, data rows : "+searchable.getModel().getValueAt(0, 0));
