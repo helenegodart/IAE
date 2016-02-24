@@ -10,7 +10,6 @@ import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 
-import Controleur.Sauvegarder;
 import model.Connecteur;
 
 @SuppressWarnings("serial")

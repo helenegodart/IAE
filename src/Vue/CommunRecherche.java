@@ -2,7 +2,6 @@ package Vue;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.awt.event.ActionListener;
 import java.util.Observable;
 import java.util.Observer;
@@ -54,9 +53,6 @@ public class CommunRecherche extends JPanel implements Observer{
 		conteneur_barre = new JPanel();
 		
 		((Observable) searchable).addObserver(this);
-		
-		//Paramètres du tableau
-		
 		
 		//Taille des éléments
 		zone_recherche.setPreferredSize(new Dimension(150, 30));
