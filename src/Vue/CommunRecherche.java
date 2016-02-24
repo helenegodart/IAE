@@ -4,6 +4,8 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionListener;
+import java.util.Observable;
+import java.util.Observer;
 
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -11,6 +13,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.table.TableModel;
 
 import AjusteurColonnes.AdjusterHandler;
 import Controleur.EffacerRecherche;
@@ -18,9 +21,11 @@ import Controleur.Sauvegarder;
 import interfaces.Searchable;
 
 @SuppressWarnings("serial")
-public class CommunRecherche extends JPanel{
+public class CommunRecherche extends JPanel implements Observer{
 	
 	private JTable tableau; 
+	private TableModel resultats;
+	private Searchable searchable;
 	private JScrollPane scroll;
 	private AdjusterHandler taille_tableau;
 	
@@ -36,7 +41,9 @@ public class CommunRecherche extends JPanel{
 	public CommunRecherche(Searchable searchable) {
 		
 		//Initialisation
-		tableau = new JTable(searchable.getModel());
+		this.searchable = searchable;
+		resultats = searchable.getModel();
+		tableau = new JTable(resultats);
 		scroll = new JScrollPane(tableau, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 		conteneur_recherche = new JPanel();
 		rechercher = new JButton("Rechercher");
@@ -45,6 +52,8 @@ public class CommunRecherche extends JPanel{
 		zone_recherche = new JTextField("Rechercher un élément");
 		conteneur_bouton = new JPanel();
 		conteneur_barre = new JPanel();
+		
+		((Observable) searchable).addObserver(this);
 		
 		//Paramètres du tableau
 		taille_tableau = new AdjusterHandler(tableau);
@@ -85,6 +94,18 @@ public class CommunRecherche extends JPanel{
 		
 		rechercher.addActionListener(action_listener);		
 		
+	}
+	
+	@Override
+	public void update(Observable arg0, Object arg1) {
+		tableau = new JTable(resultats);
+		this.scroll.setViewportView(tableau);
+		this.revalidate();
+		System.out.println("update, data rows : "+searchable.getModel().getValueAt(0, 0));
+	}
+	
+	public JTextField getZone_recherche() {
+		return zone_recherche;
 	}
 
 }

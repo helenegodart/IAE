@@ -17,6 +17,8 @@ import org.jdom2.Element;
 import org.jdom2.JDOMException;
 import org.jdom2.input.SAXBuilder;
 
+import com.sun.xml.internal.messaging.saaj.util.TeeInputStream;
+
 /**
  * 
  * @author cottin4u
@@ -42,9 +44,13 @@ public class TableModel extends AbstractTableModel{
 	private File sqlFile;
 	private Document sqlDoc;
 	private HashMap<Integer, String> colonneNames;
+	private HashMap<String, Integer> colonneNamesIndex;
 	private ArrayList<ArrayList<String>> data;
 	private String databaseName, nomRecherche, colonneRecherche, tableRecherche;
 	private Connection con;
+	private ArrayList<String> caracteresAEviter;
+	private String[] lettres = {"b", "c", "d", "e", "f", "g", "h", "i", "j"};
+	private HashMap<String, String> lettreNom;
 	
 	public TableModel(String sqlFile, String databaseName, Connection con, String tableRecherche, String colonneRecherche, String nomRecherche) {
 		this.sqlFile = new File(sqlFile);
@@ -53,6 +59,9 @@ public class TableModel extends AbstractTableModel{
 		this.colonneRecherche = colonneRecherche;
 		this.tableRecherche = tableRecherche;
 		this.con = con;
+		this.caracteresAEviter = new ArrayList<String>();
+		this.lettreNom = new HashMap<String, String>();
+		initialiseCaracteres();
 		SAXBuilder sax = new SAXBuilder();
 		try {
 			sqlDoc = sax.build(this.sqlFile);
@@ -63,6 +72,7 @@ public class TableModel extends AbstractTableModel{
 		}
 		
 		colonneNames = new HashMap<Integer, String>();
+		colonneNamesIndex = new HashMap<String, Integer>();
 		data = new ArrayList<ArrayList<String>>();
 		
 		//Remplissage de la table si une recherche est demandée <=> si nomRecherche != null
@@ -91,7 +101,7 @@ public class TableModel extends AbstractTableModel{
 			if (table.getAttribute("all") == null) {
 				//On sélectionne toutes les colonnes qui nous intéressent
 				for (Element colonne : table.getChildren("colonne")) {
-					sql += colonne.getAttributeValue("nom")+", ";
+					sql += "a."+colonne.getAttributeValue("nom")+", ";
 				}
 				//On enlève la dernière virgule
 				sql = sql.substring(0, sql.length()-2);
@@ -100,15 +110,22 @@ public class TableModel extends AbstractTableModel{
 			else
 				sql += "*";
 			//On rajoute la table
-			sql += " FROM "+nomTable;
+			sql += " FROM "+ajoutNomTables(table);
 			
 			//On rajoute les conditions de jointures si il y en a
 			sql += " WHERE ";
 			condition = table.getChild("condition");
 			//Si il y a une condition de jointure
-			if (!condition.getText().equals("")) 
-				sql += condition.getText() + " AND ";
-			sql += tableRecherche+"."+colonneRecherche+" LIKE '"+nomRecherche+"'";
+			if (!condition.getText().equals("")) {
+				String texte = condition.getText();
+				for (String string : lettreNom.keySet()) {
+					if (texte.contains(string)) {
+						texte = texte.replace(string, lettreNom.get(string));
+					}
+				}
+				sql += texte + " AND ";
+			}
+			sql += lettreNom.get(tableRecherche.substring(tableRecherche.indexOf(".")+1))+"."+colonneRecherche+" LIKE '"+nomRecherche+"'";
 			//On finalise la requête
 			sql += ";";
 			
@@ -125,17 +142,93 @@ public class TableModel extends AbstractTableModel{
 			//Ajout des noms de colonnes
 			for (int i = 1; i <= nbColonnes; i++) {
 				colonneNames.put(colonneNames.size(), nomTable+"."+res.getMetaData().getColumnLabel(i));
+				colonneNamesIndex.put(res.getMetaData().getColumnLabel(i), colonneNamesIndex.size());
 			}
 			//Ajout des données
+			int nbLignes = 0;
 			while (res.next()) {
+				nbLignes++;
 				ArrayList<String> ligne = new ArrayList<String>();
+				//Initialisation
+				for (int i = 0; i < colonneNames.size(); i++) {
+					ligne.add("");
+				}
 				for (int i = 1; i <= nbColonnes; i++) {
-					ligne.add(res.getObject(i).toString());
+					ligne.set(colonneNamesIndex.get(res.getMetaData().getColumnName(i)),res.getObject(i).toString());
 				} 
 				data.add(ligne);
 			}
+			if (nbLignes == 0) {
+				ArrayList<String> ligne = new ArrayList<String>();
+				for (int i = 0; i < colonneNames.size(); i++) {
+					ligne.add("");
+				}
+				data.add(ligne);
+			}
 			res.close();
+			sql = "SELECT ";
 		}//Fin du for sur les tables
+		//Traitement de data pour merger les résultats dans une seule ligne
+		ArrayList<String> r = new ArrayList<String>();
+		int index = 0;
+		for (ArrayList<String> list : data) {
+			for (int i = 0; i < list.size(); i++) {
+				if (i >= index) {
+					r.add(index, list.get(i));
+					index++;
+				}
+			}
+		}
+		data.clear();
+		data.add(r);
+		System.out.println(data.toString());
+	}
+	
+	private String ajoutNomTables(Element table) {
+		Element condition = table.getChild("condition");
+		if (!condition.getText().equals("")) {
+			String texte = condition.getText();
+			String[] tab = texte.split("\\.");
+			String retour = "";
+			int j = 0;
+			String car = "";
+//			System.out.println(texte+", tab[i] : "+tab.length);
+			for (int i = 0; i < tab.length-1; i++) {
+				while (tab[i].length()-j-1 >= 0 && 
+						!caracteresAEviter.contains(car)) {
+					car = tab[i].substring(tab[i].length()-j-1, tab[i].length()-j);
+					j++;
+				}
+				j--;
+				if (caracteresAEviter.contains(car)) j--;
+				if (table.getAttributeValue("nom").equals(tab[i].substring(tab[i].length()-j-1))){
+					lettreNom.put(tab[i].substring(tab[i].length()-j-1), "a");
+					retour += ", "+databaseName+"."+tab[i].substring(tab[i].length()-j-1)+" a";
+				}
+				else {
+					lettreNom.put(tab[i].substring(tab[i].length()-j-1), lettres[i]);
+					retour += ", "+databaseName+"."+tab[i].substring(tab[i].length()-j-1)+" "+lettres[i];
+				}
+				j=0;
+			}
+			retour = retour.substring(2);
+			return retour;
+		}
+		else{
+			lettreNom.put(table.getAttributeValue("nom"), "a");
+			return databaseName+"."+table.getAttributeValue("nom")+" a";
+		}
+	}
+	
+	private void initialiseCaracteres() {
+		caracteresAEviter.add(" ");
+		caracteresAEviter.add("<");
+		caracteresAEviter.add(">");
+		caracteresAEviter.add("=");
+		caracteresAEviter.add("!");
+		caracteresAEviter.add(",");
+		caracteresAEviter.add(";");
+		
 	}
 	
 	@Override

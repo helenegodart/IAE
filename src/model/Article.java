@@ -20,7 +20,7 @@ public class Article extends Observable implements Searchable{
 	public Article(Connection con, String nomArticle) {
 		this.nomArticle = nomArticle;
 		this.con = con;
-		model = new TableModel("articles.xml", "IAE3ASIE", con, "ITMMASTER", "ITMREF_0", nomArticle);
+		model = new TableModel("articles_optimises.xml", "IAE3ASIE", con, "ITMMASTER", "ITMREF_0", nomArticle);
 		table = new JTable(model);
 		
 	}

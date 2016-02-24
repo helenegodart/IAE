@@ -8,7 +8,7 @@ import javax.swing.JProgressBar;
 @SuppressWarnings("serial")
 public class BarreProgression extends JFrame{
 	
-	private JProgressBar bar;
+	public static JProgressBar bar;
 
 	public BarreProgression(){      
 		
